@@ -1,0 +1,16 @@
+# Dependencias de Node
+node_modules/
+
+# Entornos virtuales de Python
+venv/
+__pycache__/
+
+# Variables de entorno (¡NUNCA SUBIR CONTRASEÑAS A GITHUB!)
+.env
+
+# Archivos de Flutter (lo configuraremos después)
+.dart_tool/
+build/
+
+# Bases de datos locales
+data/
