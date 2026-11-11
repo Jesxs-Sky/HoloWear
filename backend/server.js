@@ -20,6 +20,9 @@ app.get('/', (req, res) => {
   res.send('Servidor backend de HoloWear en línea');
 });
 
+// Importa y usa las rutas de proyectos
+app.use('/api/projects', require('./routes/projectRoutes'));
+
 // Iniciar el servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
