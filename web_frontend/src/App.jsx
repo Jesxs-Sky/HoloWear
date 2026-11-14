@@ -1,38 +1,40 @@
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 
-function App() {
+export default function App() {
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-[#111111] selection:bg-yellow-300 selection:text-[#111111]">
+    <div className="min-h-screen bg-[#F7F4EE] text-[#1F1B16] selection:bg-[#EFE9DF] selection:text-[#1F1B16]">
       <Navbar />
       <main>
         <Hero />
 
-        {/* Cinta continua minimalista */}
-        <div className="border-y border-neutral-200 bg-white py-3.5 overflow-hidden select-none">
-          <div className="animate-marquee flex items-center gap-10 text-xs font-medium tracking-widest uppercase text-neutral-500">
-            <span>Escanea tu prenda con IA</span>
-            <span className="text-blue-600">●</span>
-            <span>Proyecta el corte en realidad aumentada</span>
-            <span className="text-green-600">●</span>
-            <span>Conecta con talleres locales</span>
-            <span className="text-yellow-500">●</span>
-            <span>Moda circular a medida</span>
-            <span className="text-red-600">●</span>
-            {/* Duplicado para bucle continuo sin saltos */}
-            <span>Escanea tu prenda con IA</span>
-            <span className="text-blue-600">●</span>
-            <span>Proyecta el corte en realidad aumentada</span>
-            <span className="text-green-600">●</span>
-            <span>Conecta con talleres locales</span>
-            <span className="text-yellow-500">●</span>
-            <span>Moda circular a medida</span>
-            <span className="text-red-600">●</span>
+        {/* Franja estática del flujo de trabajo */}
+        <section
+          id="proceso"
+          className="border-y border-[#1F1B16]/8 bg-[#FDFBF7]"
+        >
+          <div className="max-w-7xl mx-auto px-6 sm:px-8 py-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-[14px] leading-[20px] tabular-nums">
+            <div className="flex items-baseline gap-3">
+              <span className="text-[12px] text-[#7B7266]">01</span>
+              <span className="text-[#5E554A]">
+                Escaneo de medidas y desgaste con cámara móvil
+              </span>
+            </div>
+            <div className="flex items-baseline gap-3">
+              <span className="text-[12px] text-[#7B7266]">02</span>
+              <span className="text-[#5E554A]">
+                Proyección de cortes y parches en realidad aumentada
+              </span>
+            </div>
+            <div className="flex items-baseline gap-3">
+              <span className="text-[12px] text-[#7B7266]">03</span>
+              <span className="text-[#5E554A]">
+                Envío directo de ficha técnica a talleres locales
+              </span>
+            </div>
           </div>
-        </div>
+        </section>
       </main>
     </div>
   );
 }
-
-export default App;

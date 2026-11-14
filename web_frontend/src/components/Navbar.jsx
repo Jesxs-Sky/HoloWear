@@ -2,48 +2,48 @@ import { ArrowUpRight } from 'lucide-react';
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 bg-[#FAFAFA]/90 backdrop-blur-md border-b border-neutral-200/80">
-      <div className="max-w-7xl mx-auto px-5 sm:px-10 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-[#F7F4EE]/92 backdrop-blur-md border-b border-[#1F1B16]/8">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center justify-between">
         
-        {/* Marca + Etiqueta roja tipo prenda */}
-        <a href="#" className="flex items-center gap-2 group">
-          <span className="font-bold text-xl tracking-tight text-[#111111]">
+        {/* Marca */}
+        <a href="#" className="flex items-center gap-2 text-[#1F1B16]">
+          <span className="text-[17px] font-medium tracking-[-0.01em]">
             HoloWear
           </span>
-          <span className="bg-red-600 text-white text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-[2px] group-hover:rotate-3 transition-transform">
+          <span className="text-[12px] text-[#7B7266] px-2 py-0.5 rounded-md bg-[#EFE9DF] border border-[#1F1B16]/8">
             Atelier
           </span>
         </a>
 
-        {/* Navegación con puntada amarilla en hover */}
-        <nav className="hidden md:flex items-center gap-9 text-sm font-medium text-neutral-600">
+        {/* Enlaces de navegación */}
+        <nav className="hidden md:flex items-center gap-8 text-[14px] font-normal text-[#5E554A]">
           <a
             href="#lookbook"
-            className="py-1 border-b-2 border-transparent hover:border-dashed hover:border-yellow-500 hover:text-[#111111] transition-all"
+            className="py-1 border-b-[1.5px] border-transparent hover:border-dashed hover:border-[#1F1B16] hover:text-[#1F1B16] transition-atelier"
           >
             Transformaciones
           </a>
           <a
             href="#proceso"
-            className="py-1 border-b-2 border-transparent hover:border-dashed hover:border-yellow-500 hover:text-[#111111] transition-all"
+            className="py-1 border-b-[1.5px] border-transparent hover:border-dashed hover:border-[#1F1B16] hover:text-[#1F1B16] transition-atelier"
           >
             Cómo funciona
           </a>
           <a
             href="#talleres"
-            className="py-1 border-b-2 border-transparent hover:border-dashed hover:border-yellow-500 hover:text-[#111111] transition-all"
+            className="py-1 border-b-[1.5px] border-transparent hover:border-dashed hover:border-[#1F1B16] hover:text-[#1F1B16] transition-atelier"
           >
             Talleres locales
           </a>
         </nav>
 
-        {/* Botón minimalista */}
+        {/* Acción principal del encabezado */}
         <a
           href="#descargar"
-          className="bg-[#111111] hover:bg-neutral-800 text-white text-xs sm:text-sm font-medium px-4 sm:px-5 py-2.5 rounded-full transition-all flex items-center gap-1.5 border border-transparent hover:border-dashed hover:border-yellow-400"
+          className="h-9 px-4 rounded-lg bg-[#1F1B16] hover:bg-[#332D25] text-[#FDFBF7] text-[14px] font-medium transition-atelier inline-flex items-center gap-2"
         >
-          <span>Descargar App</span>
-          <ArrowUpRight className="w-4 h-4 text-yellow-400" />
+          <span>Descargar app</span>
+          <ArrowUpRight className="w-4 h-4 stroke-[1.5] text-[#EFE9DF]" />
         </a>
 
       </div>

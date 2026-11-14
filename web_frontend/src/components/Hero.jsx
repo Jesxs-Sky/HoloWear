@@ -1,15 +1,17 @@
 import { useState, useRef } from 'react';
-import { MoveHorizontal, ArrowRight, Sparkles } from 'lucide-react';
+import { MoveHorizontal, ArrowRight, Scissors, Scan } from 'lucide-react';
+import jacketBefore from '../assets/jacket-before.jpg';
+import jacketAfter from '../assets/jacket-after.jpg';
 
 const THREAD_SWATCHES = [
-  { id: 'blue', name: 'Índigo AR', hex: '#2563EB', ring: 'ring-blue-600' },
-  { id: 'green', name: 'Verde Eco', hex: '#16A34A', ring: 'ring-green-600' },
-  { id: 'yellow', name: 'Hilo Ocre', hex: '#EAB308', ring: 'ring-yellow-500' },
-  { id: 'red', name: 'Pespunte Rojo', hex: '#DC2626', ring: 'ring-red-600' },
+  { id: 'indigo', name: 'Índigo AR', hex: '#1D4ED8', ring: 'ring-[#1D4ED8]' },
+  { id: 'olive', name: 'Verde eco', hex: '#15803D', ring: 'ring-[#15803D]' },
+  { id: 'ochre', name: 'Hilo ocre', hex: '#CA8A04', ring: 'ring-[#CA8A04]' },
+  { id: 'crimson', name: 'Pespunte rojo', hex: '#DC2626', ring: 'ring-[#DC2626]' },
 ];
 
 export default function Hero() {
-  const [sliderPos, setSliderPos] = useState(52);
+  const [sliderPos, setSliderPos] = useState(50);
   const [activeThread, setActiveThread] = useState(THREAD_SWATCHES[0]);
   const containerRef = useRef(null);
 
@@ -32,41 +34,32 @@ export default function Hero() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-5 sm:px-10 pt-10 pb-16 lg:py-20">
+    <section className="max-w-7xl mx-auto px-6 sm:px-8 pt-12 pb-16 lg:pt-24 lg:pb-24">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
         
-        {/* COLUMNA IZQUIERDA: Editorial limpia (6 columnas) */}
-        <div className="lg:col-span-6 space-y-7">
+        {/* Columna izquierda: texto y muestrario de hilos */}
+        <div className="lg:col-span-6 space-y-6">
           
-          {/* Indicador ecológico minimalista */}
-          <div className="inline-flex items-center gap-2 text-xs font-medium text-neutral-600">
-            <span className="w-2 h-2 rounded-full bg-green-600"></span>
-            <span>Suprarreciclaje textil · Escaneo AR y confección local</span>
+          <div className="inline-flex items-center gap-2 text-[13px] text-[#5E554A]">
+            <Scan className="w-4 h-4 stroke-[1.5] text-[#7B7266]" />
+            <span>Escaneo en realidad aumentada y confección en taller</span>
           </div>
 
-          {/* Titular editorial */}
-          <h1 className="text-4xl sm:text-6xl lg:text-[4.25rem] font-semibold tracking-tight leading-[1.04] text-[#111111]">
+          <h1 className="text-[36px] sm:text-[44px] lg:text-[60px] font-normal tracking-[-0.025em] leading-[1.05] text-[#1F1B16]">
             Rediseña las prendas que{' '}
-            <span className="font-serif italic font-normal text-neutral-700">
-              ya viven
-            </span>{' '}
-            en tu armario.
+            <span className="font-serif text-[#5E554A]">ya viven</span>{' '}
+            en tu armario
           </h1>
 
-          {/* Descripción breve */}
-          <p className="text-base sm:text-lg text-neutral-600 max-w-lg leading-relaxed">
-            Escanea ropa en desuso desde tu teléfono, visualiza cortes y costuras a medida en realidad aumentada y envíala a un taller local para darle una segunda vida.
+          <p className="text-[18px] leading-[28px] font-normal text-[#5E554A] max-w-[36rem]">
+            Escanea ropa en desuso desde tu teléfono, proyecta cortes y costuras a medida en realidad aumentada y envíala a un taller local para darle una segunda vida.
           </p>
 
-          {/* Muestrario interactivo de hilos (Paleta HoloWear) */}
-          <div className="pt-1 space-y-2.5">
-            <div className="flex items-center justify-between max-w-xs">
-              <span className="text-xs font-medium text-neutral-500">
-                Muestrario de puntada AR:
-              </span>
-              <span className="text-xs font-semibold text-[#111111]">
-                {activeThread.name}
-              </span>
+          {/* Muestrario de hilo (único punto multicolor de la página) */}
+          <div className="pt-2 space-y-3">
+            <div className="flex items-center justify-between max-w-xs text-[13px]">
+              <span className="text-[#7B7266]">Color de puntada AR</span>
+              <span className="font-medium text-[#1F1B16]">{activeThread.name}</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -75,13 +68,14 @@ export default function Hero() {
                 return (
                   <button
                     key={swatch.id}
+                    type="button"
                     onClick={() => setActiveThread(swatch)}
                     aria-label={swatch.name}
                     style={{ backgroundColor: swatch.hex }}
-                    className={`w-7 h-7 rounded-full transition-all cursor-pointer ${
+                    className={`w-7 h-7 rounded-full transition-atelier cursor-pointer focus:outline-none focus-visible:ring-2 ${
                       isSelected
-                        ? `ring-2 ring-offset-2 ring-offset-[#FAFAFA] ${swatch.ring} scale-110`
-                        : 'opacity-75 hover:opacity-100'
+                        ? `ring-2 ring-offset-2 ring-offset-[#F7F4EE] ${swatch.ring}`
+                        : 'opacity-80 hover:opacity-100'
                     }`}
                   />
                 );
@@ -89,42 +83,42 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Botones de acción */}
-          <div className="pt-2 flex flex-wrap items-center gap-4">
+          {/* Acciones */}
+          <div className="pt-2 flex flex-wrap items-center gap-3">
             <a
               href="#descargar"
-              className="bg-[#111111] hover:bg-neutral-800 text-white text-sm font-medium px-7 py-4 rounded-full transition-all flex items-center gap-2.5 group"
+              className="h-11 px-5 rounded-lg bg-[#1F1B16] hover:bg-[#332D25] text-[#FDFBF7] text-[14px] font-medium transition-atelier inline-flex items-center gap-2"
             >
-              <span>Escanear mi primera prenda</span>
-              <ArrowRight className="w-4 h-4 text-yellow-400 group-hover:translate-x-1 transition-transform" />
+              <span>Escanear primera prenda</span>
+              <ArrowRight className="w-4 h-4 stroke-[1.5] text-[#EFE9DF]" />
             </a>
 
             <a
               href="#lookbook"
-              className="text-sm font-medium text-neutral-700 hover:text-[#111111] px-4 py-3 underline underline-offset-4 decoration-neutral-300 hover:decoration-yellow-500 transition-colors"
+              className="h-11 px-5 rounded-lg bg-[#EFE9DF] hover:bg-[#E5DDD0] text-[#1F1B16] border border-[#1F1B16]/8 text-[14px] font-medium transition-atelier inline-flex items-center gap-2"
             >
-              Ver catálogo de piezas
+              <span>Ver catálogo</span>
             </a>
           </div>
 
-          {/* Ficha limpia tipo etiqueta de prenda */}
-          <div className="pt-6 border-t border-neutral-200 grid grid-cols-3 gap-4 max-w-lg">
+          {/* Métricas estimadas de la pieza */}
+          <div className="pt-6 border-t border-[#1F1B16]/8 grid grid-cols-3 gap-6 max-w-lg tabular-nums">
             <div>
-              <p className="text-xs text-neutral-500">Ahorro hídrico</p>
-              <p className="text-base font-semibold text-green-700 mt-0.5">2,100 L</p>
+              <p className="text-[12px] leading-[16px] text-[#7B7266]">Ahorro estimado</p>
+              <p className="text-[16px] font-medium text-[#1F1B16] mt-1">2,100 L agua</p>
             </div>
             <div>
-              <p className="text-xs text-neutral-500">Tiempo de patrón</p>
-              <p className="text-base font-semibold text-[#111111] mt-0.5">30 seg</p>
+              <p className="text-[12px] leading-[16px] text-[#7B7266]">Trazo de patrón</p>
+              <p className="text-[16px] font-medium text-[#1F1B16] mt-1">30 seg</p>
             </div>
             <div>
-              <p className="text-xs text-neutral-500">Red activa</p>
-              <p className="text-base font-semibold text-[#111111] mt-0.5">+40 Talleres</p>
+              <p className="text-[12px] leading-[16px] text-[#7B7266]">Red disponible</p>
+              <p className="text-[16px] font-medium text-[#1F1B16] mt-1">42 talleres</p>
             </div>
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: Deslizador Antes / Después (6 columnas) */}
+        {/* Columna derecha: comparador Antes / Después */}
         <div className="lg:col-span-6">
           <div
             ref={containerRef}
@@ -132,84 +126,84 @@ export default function Hero() {
             onMouseMove={handleMouseMove}
             onTouchStart={handleTouchMove}
             onTouchMove={handleTouchMove}
-            className="relative w-full aspect-[4/5] max-w-lg mx-auto rounded-2xl overflow-hidden bg-neutral-200 select-none touch-none cursor-ew-resize shadow-sm"
+            className="relative w-full aspect-[4/5] max-w-lg mx-auto rounded-2xl overflow-hidden bg-[#F7F4EE] border border-[#1F1B16]/8 select-none touch-none cursor-ew-resize"
           >
-            {/* CAPA BASE (DERECHA): Prenda rediseñada con patrón AR */}
+            {/* Capa base (derecha): prenda rediseñada con trazo de corte */}
             <div className="absolute inset-0">
               <img
-                src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=900&q=85"
-                alt="Chaqueta Denim Rediseñada"
-                className="w-full h-full object-cover saturate-115 contrast-105"
+                src={jacketAfter}
+                alt="Chaqueta de mezclilla transformada con paneles de lino y algodón"
+                className="w-full h-full object-cover"
                 draggable="false"
               />
 
-              {/* Líneas de patronaje y costura AR dinámicas según el hilo seleccionado */}
+              {/* Trazo de costura AR sobre los paneles de la chaqueta */}
               <svg
                 viewBox="0 0 400 500"
                 className="absolute inset-0 w-full h-full pointer-events-none"
               >
-                <path
-                  d="M 115 140 L 285 140 L 270 390 L 130 390 Z"
+                {/* Panel bolsillo izquierdo */}
+                <rect
+                  x="130"
+                  y="148"
+                  width="54"
+                  height="64"
+                  rx="2"
                   fill="none"
                   stroke={activeThread.hex}
-                  strokeWidth="2.5"
-                  strokeDasharray="8 6"
-                />
-                <line
-                  x1="122"
-                  y1="255"
-                  x2="278"
-                  y2="230"
-                  stroke={activeThread.hex}
-                  strokeWidth="2.5"
+                  strokeWidth="1.5"
                   strokeDasharray="6 4"
                 />
-                <circle cx="115" cy="140" r="5" fill={activeThread.hex} />
-                <circle cx="285" cy="140" r="5" fill={activeThread.hex} />
-                <circle cx="278" cy="230" r="5" fill={activeThread.hex} />
+                {/* Panel inferior torso */}
+                <path
+                  d="M 122 252 L 278 252 L 274 378 L 126 378 Z"
+                  fill="none"
+                  stroke={activeThread.hex}
+                  strokeWidth="1.5"
+                  strokeDasharray="6 4"
+                />
+                {/* Alfileres de registro en esquinas */}
+                <circle cx="130" cy="148" r="3" fill={activeThread.hex} />
+                <circle cx="184" cy="148" r="3" fill={activeThread.hex} />
+                <circle cx="122" cy="252" r="3" fill={activeThread.hex} />
+                <circle cx="278" cy="252" r="3" fill={activeThread.hex} />
               </svg>
 
-              {/* Etiqueta superior derecha */}
-              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-[#111111] text-[11px] font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                <span>Patrón AR + Taller</span>
-              </div>
-
-              {/* Etiqueta roja discreta cosida en la prenda */}
-              <div className="absolute bottom-4 right-4 bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[2px] shadow">
-                Confección Local · 1.2 km
+              <div className="absolute top-4 right-4 bg-[#FDFBF7]/92 backdrop-blur-sm text-[#1F1B16] border border-[#1F1B16]/8 text-[12px] font-medium px-3 py-1.5 rounded-md inline-flex items-center gap-2">
+                <Scissors className="w-4 h-4 stroke-[1.5] text-[#5E554A]" />
+                <span>Patrón propuesto</span>
               </div>
             </div>
 
-            {/* CAPA RECORTADA (IZQUIERDA): Prenda original en desuso */}
+            {/* Capa recortada (izquierda): prenda original */}
             <div
               style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
               className="absolute inset-0"
             >
               <img
-                src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=900&q=85"
-                alt="Prenda Original Desgastada"
-                className="w-full h-full object-cover grayscale contrast-90 brightness-95"
+                src={jacketBefore}
+                alt="Chaqueta de mezclilla original antes del rediseño"
+                className="w-full h-full object-cover"
                 draggable="false"
               />
-              <div className="absolute top-4 left-4 bg-[#111111]/80 backdrop-blur-sm text-white text-[11px] font-medium px-3 py-1.5 rounded-full">
+              <div className="absolute top-4 left-4 bg-[#1F1B16]/88 backdrop-blur-sm text-[#FDFBF7] text-[12px] font-medium px-3 py-1.5 rounded-md">
                 Prenda original
               </div>
             </div>
 
-            {/* LÍNEA DIVISORIA Y TIRADOR */}
+            {/* Línea divisoria y tirador */}
             <div
               style={{ left: `${sliderPos}%` }}
-              className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(0,0,0,0.4)] pointer-events-none"
+              className="absolute top-0 bottom-0 w-px bg-[#1F1B16]/35 pointer-events-none"
             >
-              <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-[#111111] shadow-lg flex items-center justify-center border border-neutral-200">
-                <MoveHorizontal className="w-4 h-4" />
+              <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#FDFBF7] text-[#1F1B16] shadow-[0_8px_24px_rgba(31,27,22,0.12)] flex items-center justify-center border border-[#1F1B16]/12">
+                <MoveHorizontal className="w-4 h-4 stroke-[1.5]" />
               </div>
             </div>
           </div>
 
-          <p className="text-center text-xs text-neutral-400 mt-3">
-            Desliza sobre la prenda para comparar el antes y el patrón de rediseño
+          <p className="text-center text-[12px] leading-[16px] text-[#7B7266] mt-3">
+            Arrastra sobre la prenda para comparar el estado inicial y el trazo de corte
           </p>
         </div>
 
