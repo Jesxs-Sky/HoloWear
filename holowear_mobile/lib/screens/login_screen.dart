@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'splash_screen.dart';
 import 'register_screen.dart';
+import 'verification_code_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -143,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               const SizedBox(height: 6),
               const Text(
-                'Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu acceso.',
+                'Ingresa tu correo electrónico y te enviaremos un código de 6 dígitos para restablecer tu acceso.',
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.4,
@@ -187,16 +188,28 @@ class _LoginScreenState extends State<LoginScreen>
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(ctx).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                          'Si el correo está registrado, recibirás un enlace en breve.',
+                    final targetEmail = recoveryController.text.trim();
+                    if (!_emailRegex.hasMatch(targetEmail)) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            'Ingresa un correo electrónico válido.',
+                          ),
+                          backgroundColor: const Color(0xFF0A1628),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                        backgroundColor: const Color(0xFF0A1628),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      );
+                      return;
+                    }
+                    Navigator.of(ctx).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => VerificationCodeScreen(
+                          email: targetEmail,
+                          isPasswordReset: true,
                         ),
                       ),
                     );
@@ -210,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
                   child: const Text(
-                    'Enviar enlace',
+                    'Enviar código',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -273,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                     const SizedBox(height: 22),
 
-                    // 2. Título, subtítulo y firma sutil de costura + AR
+                    // 2. Título, subtítulo y firma visual de costura + AR
                     _fadeSlide(
                       start: 0.06,
                       end: 0.48,
@@ -300,7 +313,6 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                           ),
                           const SizedBox(height: 18),
-                          // Firma visual sutil: puntada textil + punto AR
                           SizedBox(
                             width: 140,
                             height: 12,
@@ -615,7 +627,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                     const SizedBox(height: 26),
 
-                    // 6. Enlace centrado de Registro (Creador o Taller)
+                    // 6. Enlace centrado de Registro
                     _fadeSlide(
                       start: 0.46,
                       end: 1.0,
@@ -639,7 +651,7 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                               children: [
                                 TextSpan(
-                                  text: 'Regístrate como Creador o Taller',
+                                  text: 'Crea tu cuenta ahora',
                                   style: TextStyle(
                                     color: Color(0xFF1D4ED8),
                                     fontWeight: FontWeight.w600,
@@ -675,16 +687,13 @@ class _StitchSignaturePainter extends CustomPainter {
     final midY = size.height / 2;
     final midX = size.width / 2;
 
-    // Puntadas izquierda
     for (double x = 0; x < midX - 12; x += 8) {
       canvas.drawLine(Offset(x, midY), Offset(x + 4, midY), stitchPaint);
     }
-    // Puntadas derecha
     for (double x = midX + 12; x < size.width; x += 8) {
       canvas.drawLine(Offset(x, midY), Offset(x + 4, midY), stitchPaint);
     }
 
-    // Rombo óptico central
     final nodePaint = Paint()
       ..color = const Color(0xFF0EA5E9)
       ..style = PaintingStyle.fill;

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'verification_code_screen.dart';
 
 class _RoleOption {
-  final String value; // 'creator' | 'workshop'
+  final String value; // 'creator' | 'workshop' | 'client'
   final String title;
   final String description;
   final IconData icon;
@@ -46,20 +47,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   static final RegExp _emailRegex =
       RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,4}$');
 
-  static const List<_RoleOption> _roles = [
-    _RoleOption(
-      value: 'creator',
-      title: 'Creador',
-      description: 'Escaneo prendas, simulo patrones 3D/AR y cotizo diseños.',
-      icon: Icons.view_in_ar_rounded,
-    ),
-    _RoleOption(
-      value: 'workshop',
-      title: 'Taller',
-      description: 'Recibo fichas técnicas de corte y confecciono bajo pedido.',
-      icon: Icons.content_cut_rounded,
-    ),
-  ];
+  static const _creatorRole = _RoleOption(
+    value: 'creator',
+    title: 'Creador',
+    description: 'Escaneo prendas, simulo patrones 3D/AR y cotizo diseños.',
+    icon: Icons.view_in_ar_rounded,
+  );
+
+  static const _workshopRole = _RoleOption(
+    value: 'workshop',
+    title: 'Taller',
+    description: 'Recibo fichas técnicas de corte y confecciono bajo pedido.',
+    icon: Icons.content_cut_rounded,
+  );
+
+  static const _clientRole = _RoleOption(
+    value: 'client',
+    title: 'Cliente',
+    description: 'Exploro el Lookbook y transformo mi ropa con talleres locales.',
+    icon: Icons.eco_outlined,
+  );
 
   final List<String> _availableSpecialties = const [
     'Denim',
@@ -107,6 +114,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _currentStep = 1);
   }
 
+  String _getSelectedRoleTitle() {
+    if (_selectedRole == 'workshop') return _workshopRole.title;
+    if (_selectedRole == 'client') return _clientRole.title;
+    return _creatorRole.title;
+  }
+
   void _submitRegistration() {
     FocusScope.of(context).unfocus();
     if (!_step2Key.currentState!.validate()) return;
@@ -121,53 +134,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    final roleLabel = _selectedRole == 'workshop' ? 'Taller' : 'Creador';
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFFFFFFFF),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.check_circle_rounded, color: Color(0xFF16A34A)),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Cuenta lista',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF0A1628),
-                ),
-              ),
-            ),
-          ],
+    // Navega a la verificación de correo con código OTP de 6 dígitos
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => VerificationCodeScreen(
+          email: _emailController.text.trim(),
+          roleTitle: _getSelectedRoleTitle(),
+          isPasswordReset: false,
         ),
-        content: Text(
-          'Hola, ${_fullNameController.text.trim()}.\n\n'
-          'Tu registro como $roleLabel en ${_cityController.text.trim()} está validado y listo para conectarse con MongoDB.',
-          style: const TextStyle(
-            fontSize: 14,
-            height: 1.45,
-            color: Color(0xFF526077),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              Navigator.of(context).pop();
-            },
-            child: const Text(
-              'Volver al Login',
-              style: TextStyle(
-                color: Color(0xFF1D4ED8),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -231,7 +205,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Barra superior limpia
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -269,7 +242,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   const SizedBox(height: 14),
 
-                  // Barra de progreso
                   Row(
                     children: [
                       Expanded(
@@ -309,7 +281,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Encabezado del paso
                   Text(
                     _currentStep == 0
                         ? 'Crea tu cuenta'
@@ -326,9 +297,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 6),
                   Text(
                     _currentStep == 0
-                        ? 'Elige si participarás como Creador o como Taller.'
+                        ? 'Elige tu perfil dentro de HoloWear y configura tu acceso.'
                         : isWorkshop
-                            ? 'Esta información permitirá que los creadores encuentren tu taller.'
+                            ? 'Esta información permitirá que creadores y clientes encuentren tu taller.'
                             : 'Indica tu ciudad base para conectarte con talleres cercanos.',
                     style: const TextStyle(
                       fontSize: 14,
@@ -371,7 +342,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         key: const ValueKey('step1'),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Selector limpio de 2 perfiles: Creador o Taller
           const Text(
             'Tu rol en HoloWear',
             style: TextStyle(
@@ -382,16 +352,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(height: 10),
 
+          // 2 tarjetas principales lado a lado (Creador / Taller)
           IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _buildRoleCard(_roles[0])),
+                Expanded(child: _buildPrimaryRoleCard(_creatorRole)),
                 const SizedBox(width: 12),
-                Expanded(child: _buildRoleCard(_roles[1])),
+                Expanded(child: _buildPrimaryRoleCard(_workshopRole)),
               ],
             ),
           ),
+
+          const SizedBox(height: 10),
+
+          // Tarjeta horizontal limpia para Cliente
+          _buildSecondaryRoleCard(_clientRole),
 
           const SizedBox(height: 22),
 
@@ -567,7 +543,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildRoleCard(_RoleOption role) {
+  Widget _buildPrimaryRoleCard(_RoleOption role) {
     final selected = _selectedRole == role.value;
 
     return GestureDetector(
@@ -679,9 +655,124 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  Widget _buildSecondaryRoleCard(_RoleOption role) {
+    final selected = _selectedRole == role.value;
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedRole = role.value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        decoration: BoxDecoration(
+          gradient: selected
+              ? const LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xFFEFF6FF), Color(0xFFFFFFFF)],
+                )
+              : null,
+          color: selected ? null : const Color(0xFFF6F9FC),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected
+                ? const Color(0xFF1D4ED8)
+                : const Color(0xFFD6E4F5),
+            width: selected ? 1.8 : 1.0,
+          ),
+          boxShadow: selected
+              ? const [
+                  BoxShadow(
+                    color: Color(0x1A1D4ED8),
+                    blurRadius: 14,
+                    offset: Offset(0, 5),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                gradient: selected
+                    ? const LinearGradient(
+                        colors: [Color(0xFF1D4ED8), Color(0xFF0284C7)],
+                      )
+                    : null,
+                color: selected ? null : const Color(0xFFE8F1FC),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(
+                role.icon,
+                size: 19,
+                color: selected ? Colors.white : const Color(0xFF1D4ED8),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    role.title,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0A1628),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    role.description,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      height: 1.3,
+                      color: Color(0xFF526077),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: selected
+                    ? const Color(0xFF1D4ED8)
+                    : Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selected
+                      ? const Color(0xFF1D4ED8)
+                      : const Color(0xFFCBD5E1),
+                  width: 1.5,
+                ),
+              ),
+              child: selected
+                  ? const Icon(
+                      Icons.check_rounded,
+                      size: 13,
+                      color: Colors.white,
+                    )
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildStep2Form(bool isWorkshop) {
-    final ctaLabel =
-        isWorkshop ? 'Registrar Taller' : 'Crear cuenta de Creador';
+    final ctaLabel = _selectedRole == 'workshop'
+        ? 'Registrar Taller'
+        : _selectedRole == 'client'
+            ? 'Crear cuenta de Cliente'
+            : 'Crear cuenta de Creador';
 
     return Form(
       key: _step2Key,
