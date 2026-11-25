@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1750),
+      duration: const Duration(milliseconds: 1650),
     );
 
     _emblemFade = CurvedAnimation(
@@ -39,28 +39,27 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    // Barrido óptico sutil sobre el emblema (referencia al escaneo AR)
     _scanLineProgress = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.25, 0.80, curve: Curves.easeInOut),
+      curve: const Interval(0.22, 0.82, curve: Curves.easeInOut),
     );
 
     _wordmarkFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.45, 0.90, curve: Curves.easeOut),
+      curve: const Interval(0.45, 0.92, curve: Curves.easeOut),
     );
 
     _controller.forward();
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Future.delayed(const Duration(milliseconds: 250), () {
+        Future.delayed(const Duration(milliseconds: 220), () {
           if (!mounted) return;
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
-              transitionDuration: const Duration(milliseconds: 650),
-              pageBuilder: (_, __, ___) => const LoginScreen(),
-              transitionsBuilder: (_, animation, __, child) {
+              transitionDuration: const Duration(milliseconds: 600),
+              pageBuilder: (_, _, _) => const LoginScreen(),
+              transitionsBuilder: (_, animation, _, child) {
                 return FadeTransition(
                   opacity: CurvedAnimation(
                     parent: animation,
@@ -85,35 +84,49 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F4EE),
+      backgroundColor: const Color(0xFFFFFFFF),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Logo conectado mediante Hero hacia la pantalla de Login
             FadeTransition(
               opacity: _emblemFade,
               child: ScaleTransition(
                 scale: _emblemScale,
                 child: Hero(
                   tag: 'holowear-brand-emblem',
-                  child: _BrandEmblem(scanAnimation: _scanLineProgress, size: 92),
+                  child: BrandEmblem(
+                    scanAnimation: _scanLineProgress,
+                    size: 92,
+                  ),
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
             FadeTransition(
               opacity: _wordmarkFade,
-              child: const Text(
-                'HoloWear',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.5,
-                  color: Color(0xFF1F1B16),
-                ),
+              child: const Column(
+                children: [
+                  Text(
+                    'HoloWear',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.6,
+                      color: Color(0xFF0A1628),
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'SUPRARRECICLAJE · AR',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 2.2,
+                      color: Color(0xFF0284C7),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -123,62 +136,73 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-/// Emblema con esquinas de visor AR y barrido óptico opcional
-class _BrandEmblem extends StatelessWidget {
+/// Emblema con esquinas de visor AR y resplandor óptico suave
+class BrandEmblem extends StatelessWidget {
   final Animation<double>? scanAnimation;
   final double size;
 
-  const _BrandEmblem({
+  const BrandEmblem({
+    super.key,
     this.scanAnimation,
-    this.size = 76,
+    this.size = 72,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: size + 16,
-      height: size + 16,
+      width: size + 18,
+      height: size + 18,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Esquinas sutiles de enfoque AR
-          CustomPaint(
-            size: Size(size + 16, size + 16),
-            painter: _ViewfinderCornersPainter(
-              color: const Color(0xFF1D4ED8).withAlpha(110),
-            ),
-          ),
-
-          // Contenedor del símbolo
+          // Halo cian/azul muy suave detrás del emblema
           Container(
             width: size,
             height: size,
-            padding: EdgeInsets.all(size * 0.20),
             decoration: BoxDecoration(
-              color: const Color(0xFFFDFBF7),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0x141F1B16)),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x101F1B16),
-                  blurRadius: 20,
+                  color: Color(0x1F0EA5E9),
+                  blurRadius: 24,
+                  spreadRadius: 2,
                   offset: Offset(0, 8),
                 ),
               ],
             ),
+          ),
+          CustomPaint(
+            size: Size(size + 18, size + 18),
+            painter: _ViewfinderCornersPainter(
+              color: const Color(0xFF0EA5E9).withAlpha(150),
+            ),
+          ),
+          Container(
+            width: size,
+            height: size,
+            padding: EdgeInsets.all(size * 0.18),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFFFFFFFF), Color(0xFFF4F8FD)],
+              ),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0xFFD6E4F5)),
+            ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   Image.asset(
                     kBrandSymbolPath,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Center(
+                    errorBuilder: (_, _, _) => const Center(
                       child: Icon(
                         Icons.view_in_ar_rounded,
                         color: Color(0xFF1D4ED8),
-                        size: 32,
+                        size: 30,
                       ),
                     ),
                   ),
@@ -193,13 +217,20 @@ class _BrandEmblem extends StatelessWidget {
                         return Align(
                           alignment: Alignment(0, (v * 2) - 1),
                           child: Container(
-                            height: 2,
+                            height: 2.5,
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1D4ED8).withAlpha(180),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0x000EA5E9),
+                                  Color(0xFF0EA5E9),
+                                  Color(0xFF1D4ED8),
+                                  Color(0x000EA5E9),
+                                ],
+                              ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF1D4ED8).withAlpha(90),
-                                  blurRadius: 6,
+                                  color: const Color(0xFF0EA5E9).withAlpha(110),
+                                  blurRadius: 8,
                                 ),
                               ],
                             ),
@@ -227,7 +258,7 @@ class _ViewfinderCornersPainter extends CustomPainter {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
+      ..strokeWidth = 1.6
       ..strokeCap = StrokeCap.round;
 
     const len = 10.0;
@@ -235,7 +266,6 @@ class _ViewfinderCornersPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Superior izquierda
     canvas.drawPath(
       Path()
         ..moveTo(0, len)
@@ -244,7 +274,6 @@ class _ViewfinderCornersPainter extends CustomPainter {
         ..lineTo(len, 0),
       paint,
     );
-    // Superior derecha
     canvas.drawPath(
       Path()
         ..moveTo(w - len, 0)
@@ -253,7 +282,6 @@ class _ViewfinderCornersPainter extends CustomPainter {
         ..lineTo(w, len),
       paint,
     );
-    // Inferior izquierda
     canvas.drawPath(
       Path()
         ..moveTo(0, h - len)
@@ -262,7 +290,6 @@ class _ViewfinderCornersPainter extends CustomPainter {
         ..lineTo(len, h),
       paint,
     );
-    // Inferior derecha
     canvas.drawPath(
       Path()
         ..moveTo(w - len, h)
