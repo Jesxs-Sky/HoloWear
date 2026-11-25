@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/login_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(const HoloWearApp());
@@ -14,16 +14,10 @@ class HoloWearApp extends StatelessWidget {
       title: 'HoloWear',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFFF7F4EE),
         useMaterial3: true,
-        // Configuración de colores globales de HoloWear (Light Mode)
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF3B82F6), // Azul primario
-          primary: const Color(0xFF3B82F6),
-          background: const Color(0xFFF4F5F7), // Gris/blanco de fondo
-        ),
-        fontFamily: 'Roboto', // Tipografía base del sistema
       ),
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

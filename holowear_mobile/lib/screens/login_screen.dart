@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'splash_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -7,285 +8,246 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _formController;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+
   bool _obscurePassword = true;
+  bool _isPressed = false;
+  bool _emailFocused = false;
+  bool _passwordFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _formController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 750),
+    )..forward();
+
+    _emailFocus.addListener(() {
+      setState(() => _emailFocused = _emailFocus.hasFocus);
+    });
+    _passwordFocus.addListener(() {
+      setState(() => _passwordFocused = _passwordFocus.hasFocus);
+    });
+  }
+
+  @override
+  void dispose() {
+    _formController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
+    super.dispose();
+  }
+
+  Widget _fadeSlide({
+    required double start,
+    required double end,
+    required Widget child,
+  }) {
+    final anim = CurvedAnimation(
+      parent: _formController,
+      curve: Interval(start, end, curve: Curves.easeOutCubic),
+    );
+    return FadeTransition(
+      opacity: anim,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.08),
+          end: Offset.zero,
+        ).animate(anim),
+        child: child,
+      ),
+    );
+  }
+
+  void _onLoginTap() {
+    FocusScope.of(context).unfocus();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Vista previa de inicio de sesión lista'),
+        backgroundColor: const Color(0xFF1F1B16),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // 1. Fondo Decorativo con Degradado
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFFF0F4FA), Color(0xFFEBF0F8), Color(0xFFF4F5F7)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-          
-          // Sutil simulación de curvas en el fondo
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.15,
-              child: CustomPaint(
-                painter: PatternPainter(),
-              ),
-            ),
-          ),
-
-          // 2. Contenido Scrollable
-          SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      backgroundColor: const Color(0xFFF7F4EE),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Cabecera superior
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'HoloWear • Login / Registro',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF4B5563),
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.help_outline, size: 16, color: Color(0xFF4B5563)),
-                        label: const Text('Ayuda', style: TextStyle(color: Color(0xFF4B5563), fontSize: 13)),
-                        style: TextButton.styleFrom(
-                          backgroundColor: Colors.white.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-
-                  // 3. Tarjeta Glassmorphism de Login
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(28.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.85),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF1E293B).withOpacity(0.06),
-                          blurRadius: 30,
-                          offset: const Offset(0, 15),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // Logo Redondeado
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF3B82F6),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF3B82F6).withOpacity(0.3),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5),
+                  // 1. Logo centrado (aterriza aquí desde el Splash con Hero)
+                  Center(
+                    child: Hero(
+                      tag: 'holowear-brand-emblem',
+                      child: SizedBox(
+                        width: 88,
+                        height: 88,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            CustomPaint(
+                              size: const Size(88, 88),
+                              painter: _LoginCornersPainter(
+                                color: const Color(0xFF1D4ED8).withAlpha(110),
                               ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.hexagon_outlined,
-                            color: Colors.white,
-                            size: 40,
-                          ),
+                            ),
+                            Container(
+                              width: 72,
+                              height: 72,
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFDFBF7),
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: const Color(0x141F1B16),
+                                ),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x0E1F1B16),
+                                    blurRadius: 18,
+                                    offset: Offset(0, 6),
+                                  ),
+                                ],
+                              ),
+                              child: Image.asset(
+                                kBrandSymbolPath,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.view_in_ar_rounded,
+                                  color: Color(0xFF1D4ED8),
+                                  size: 28,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 20),
+                      ),
+                    ),
+                  ),
 
-                        // Bienvenida
-                        const Text(
+                  const SizedBox(height: 24),
+
+                  // 2. Título y subtítulo centrados (fiel a tu diseño original)
+                  _fadeSlide(
+                    start: 0.10,
+                    end: 0.55,
+                    child: const Column(
+                      children: [
+                        Text(
                           'Bienvenido a HoloWear',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
+                            fontSize: 26,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.5,
+                            color: Color(0xFF1F1B16),
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        const Text(
+                        SizedBox(height: 8),
+                        Text(
                           'Suprarreciclaje textil al alcance de tu mano.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF64748B),
+                            fontSize: 15,
+                            height: 1.4,
+                            color: Color(0xFF5E554A),
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'x-x-x-x-x-x', 
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 36),
+
+                  // 3. Campo Correo electrónico
+                  _fadeSlide(
+                    start: 0.22,
+                    end: 0.68,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Correo electrónico',
                           style: TextStyle(
-                            color: Colors.grey.withOpacity(0.3),
-                            letterSpacing: 2,
-                            fontSize: 10,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF5E554A),
                           ),
                         ),
-                        const SizedBox(height: 20),
-
-                        // Formulario de Acceso: Correo
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Correo electrónico',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF334155),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            hintText: 'nombre@correo.com',
-                            hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-                            filled: true,
-                            fillColor: const Color(0xFFF8FAFC),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(color: Colors.grey.withOpacity(0.15)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(color: Colors.grey.withOpacity(0.15)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Formulario de Acceso: Contraseña
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Contraseña',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF334155),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        TextFormField(
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            hintText: '••••••••',
-                            hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-                            filled: true,
-                            fillColor: const Color(0xFFF8FAFC),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                                color: const Color(0xFF94A3B8),
-                                size: 20,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(color: Colors.grey.withOpacity(0.15)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(color: Colors.grey.withOpacity(0.15)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Botón de Iniciar Sesión
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3B82F6),
-                            minimumSize: const Size(double.infinity, 48),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            elevation: 5,
-                            shadowColor: const Color(0xFF3B82F6).withOpacity(0.4),
-                          ),
-                          child: const Text(
-                            'Iniciar Sesión',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Botón Registrarse
-                        Container(
-                          width: double.infinity,
+                        const SizedBox(height: 8),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
                           decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
-                            borderRadius: BorderRadius.circular(14),
-                            color: const Color(0xFFF8FAFC).withOpacity(0.5),
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(14),
-                            onTap: () {},
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Icon(Icons.person_add_alt_1_outlined, size: 18, color: Color(0xFF3B82F6)),
-                                  const Expanded(
-                                    child: Text(
-                                      '¿No tienes cuenta? Regístrate\ncomo Creador o Taller',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF3B82F6),
-                                      ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: _emailFocused
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(0xFF1D4ED8)
+                                          .withAlpha(22),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
                                     ),
-                                  ),
-                                  Icon(Icons.cut_outlined, size: 18, color: Colors.grey[400]),
-                                ],
-                              ),
-                            ),
+                                  ]
+                                : const [
+                                    BoxShadow(
+                                      color: Color(0x061F1B16),
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
                           ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Olvidé mi contraseña
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Olvidé mi contraseña',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF4B5563),
+                          child: TextField(
+                            controller: _emailController,
+                            focusNode: _emailFocus,
+                            keyboardType: TextInputType.emailAddress,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Color(0xFF1F1B16),
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'nombre@correo.com',
+                              hintStyle: const TextStyle(
+                                color: Color(0xFF9C9284),
+                              ),
+                              filled: true,
+                              fillColor: const Color(0xFFFDFBF7),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 15,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Color(0x1A1F1B16),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFF1D4ED8),
+                                  width: 1.5,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -293,62 +255,242 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                  // 4. Pie de página
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _socialIcon(Icons.g_mobiledata_rounded),
-                      const SizedBox(width: 14),
-                      _socialIcon(Icons.apple_rounded),
-                      const SizedBox(width: 14),
-                      _socialIcon(Icons.join_inner_rounded),
-                    ],
-                  ),
                   const SizedBox(height: 20),
-                  const Text(
-                    'v1.0.0 • Términos y Condiciones',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+
+                  // 4. Campo Contraseña
+                  _fadeSlide(
+                    start: 0.32,
+                    end: 0.78,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Contraseña',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF5E554A),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: _passwordFocused
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(0xFF1D4ED8)
+                                          .withAlpha(22),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ]
+                                : const [
+                                    BoxShadow(
+                                      color: Color(0x061F1B16),
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                          ),
+                          child: TextField(
+                            controller: _passwordController,
+                            focusNode: _passwordFocus,
+                            obscureText: _obscurePassword,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Color(0xFF1F1B16),
+                            ),
+                            decoration: InputDecoration(
+                              hintText: '••••••••',
+                              hintStyle: const TextStyle(
+                                color: Color(0xFF9C9284),
+                              ),
+                              filled: true,
+                              fillColor: const Color(0xFFFDFBF7),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 15,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  size: 20,
+                                  color: _passwordFocused
+                                      ? const Color(0xFF1D4ED8)
+                                      : const Color(0xFF7B7266),
+                                ),
+                                onPressed: () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Color(0x1A1F1B16),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFF1D4ED8),
+                                  width: 1.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // 5. Botón principal azul cobalto (coherente con toda la app)
+                  _fadeSlide(
+                    start: 0.42,
+                    end: 0.88,
+                    child: GestureDetector(
+                      onTapDown: (_) => setState(() => _isPressed = true),
+                      onTapUp: (_) {
+                        setState(() => _isPressed = false);
+                        _onLoginTap();
+                      },
+                      onTapCancel: () => setState(() => _isPressed = false),
+                      child: AnimatedScale(
+                        scale: _isPressed ? 0.98 : 1.0,
+                        duration: const Duration(milliseconds: 110),
+                        curve: Curves.easeOut,
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1D4ED8),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF1D4ED8).withAlpha(45),
+                                blurRadius: 14,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'Iniciar Sesión',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  // 6. Enlace de registro original
+                  _fadeSlide(
+                    start: 0.52,
+                    end: 1.0,
+                    child: Center(
+                      child: TextButton(
+                        onPressed: () {},
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF1D4ED8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 6,
+                          ),
+                        ),
+                        child: const Text.rich(
+                          TextSpan(
+                            text: '¿No tienes cuenta? ',
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              color: Color(0xFF5E554A),
+                              fontWeight: FontWeight.w400,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'Regístrate como Creador o Taller',
+                                style: TextStyle(
+                                  color: Color(0xFF1D4ED8),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-        ],
+        ),
       ),
-    );
-  }
-
-  Widget _socialIcon(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.6),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(0.5)),
-      ),
-      child: Icon(icon, color: const Color(0xFF4B5563), size: 22),
     );
   }
 }
 
-class PatternPainter extends CustomPainter {
+class _LoginCornersPainter extends CustomPainter {
+  final Color color;
+
+  _LoginCornersPainter({required this.color});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF3B82F6).withOpacity(0.04)
+      ..color = color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
 
-    final path = Path();
-    for (var i = 0; i < size.height; i += 40) {
-      path.moveTo(0, i.toDouble());
-      path.quadraticBezierTo(
-        size.width / 2, i + 100,
-        size.width, i.toDouble(),
-      );
-    }
-    canvas.drawPath(path, paint);
+    const len = 9.0;
+    const r = 5.0;
+    final w = size.width;
+    final h = size.height;
+
+    canvas.drawPath(
+      Path()
+        ..moveTo(0, len)
+        ..lineTo(0, r)
+        ..quadraticBezierTo(0, 0, r, 0)
+        ..lineTo(len, 0),
+      paint,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(w - len, 0)
+        ..lineTo(w - r, 0)
+        ..quadraticBezierTo(w, 0, w, r)
+        ..lineTo(w, len),
+      paint,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(0, h - len)
+        ..lineTo(0, h - r)
+        ..quadraticBezierTo(0, h, r, h)
+        ..lineTo(len, h),
+      paint,
+    );
+    canvas.drawPath(
+      Path()
+        ..moveTo(w - len, h)
+        ..lineTo(w - r, h)
+        ..quadraticBezierTo(w, h, w, h - r)
+        ..lineTo(w, h - len),
+      paint,
+    );
   }
 
   @override
